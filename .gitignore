@@ -1,0 +1,16 @@
+.mvn/timing.properties
+.settings/
+.project/
+buildNumber.properties
+dependency-reduced-pom.xml
+docs/_build
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+target/
+.classpath
+.project
+**.iml
+**.idea
