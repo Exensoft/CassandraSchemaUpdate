@@ -19,27 +19,45 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Find differences between two tables by returning a delta list.
+ */
 public class TableComparator {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TableComparator.class);
 
     private static enum CType { PARTITIONING_KEY, CLUSTERING_KEY, COLUMN }
 
-    //Keyspace of tables
-    private Keyspace keyspace;
-
     //Source table
     private Table source;
     //Target table
     private Table target;
 
+    // Default keyspace (target keyspace)
+    private Keyspace keyspace;
 
-    public TableComparator(Keyspace keyspace, Table source, Table target) {
-        this.keyspace = keyspace;
+    /**
+     * Create a TableComparator that will find differences between source table and target table.
+     * If source table is null, target table will be created.
+     * If target table is null, source table will be dropped.
+     *
+     * You can not use a null source table and a null target table
+     *
+     * @param source Source table
+     * @param target Target table
+     */
+    public TableComparator(Table source, Table target) {
         this.source = source;
         this.target = target;
+        this.keyspace = (target != null)?target.getKeyspace():source.getKeyspace();
     }
 
+    /**
+     * Returns the name of the target table if target table is not null.
+     * Returns the name of the source table if target table is null.
+     *
+     * @return The name of the concerned table.
+     */
     public String getTableName() {
         if(target != null) {
             return target.getName();
@@ -47,6 +65,13 @@ public class TableComparator {
         return source.getName();
     }
 
+    /**
+     * Find differences between two columns
+     *
+     * @param deltaList The DeltaList where differences will be added
+     * @param sourceColumn The source column
+     * @param targetColumn The target column
+     */
     private void compareColumn(DeltaList deltaList, Column sourceColumn, Column targetColumn) {
 
         //Check if column has been renamed
@@ -148,6 +173,10 @@ public class TableComparator {
     }
 
 
+    /**
+     * Find indexes differences
+     * @param deltaList The DeltaList where differences will be added
+     */
     private void compareIndexes(DeltaList deltaList) {
 
         //Find deleted (and modified) indexes (present in source table but not in target table)
@@ -194,6 +223,10 @@ public class TableComparator {
         }
     }
 
+    /**
+     * Find differences between columns
+     * @param deltaList The DeltaList where differences will be added
+     */
     private void compareColumns(DeltaList deltaList) {
         List<String> deletedColumns = new ArrayList<>();
         List<String> createdColumns = new ArrayList<>();
@@ -348,6 +381,13 @@ public class TableComparator {
         return true;
     }
 
+    /**
+     * Compare the source table with the target table and find the differences.
+     * Differences will be returned as a DeltaList that contains a sequence of operations to
+     * transform the source table into the target table
+     *
+     * @return A DeltaList object that describe the operations to apply
+     */
     public DeltaList compare() {
         DeltaList delta = new DeltaList();
 
@@ -388,6 +428,10 @@ public class TableComparator {
         }
     }
 
+    /**
+     * Add the drop table detla
+     * @param deltaList
+     */
     private void deleteTable(DeltaList deltaList) {
         deltaList.addFlag(DeltaFlag.DATA_LOSS);
         deltaList.addDelta(new DropTableDelta(keyspace, source));

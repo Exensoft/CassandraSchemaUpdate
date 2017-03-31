@@ -23,6 +23,8 @@ public class Table {
 
     private int innerIndex = 0;
 
+    private Keyspace keyspace;
+
     public Table(String name) {
         this.name = name;
         this.columns = new ArrayList<>();
@@ -49,6 +51,15 @@ public class Table {
 
     public List<Index> getIndexes() {
         return indexes;
+    }
+
+    public Keyspace getKeyspace() {
+        return keyspace;
+    }
+
+    public Table setKeyspace(Keyspace keyspace) {
+        this.keyspace = keyspace;
+        return this;
     }
 
     public Table addColumn(Column column) {

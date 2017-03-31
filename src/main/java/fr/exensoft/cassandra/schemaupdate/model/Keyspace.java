@@ -32,6 +32,7 @@ public class Keyspace {
 
     public Keyspace addTable(Table table) {
         tables.add(table);
+        table.setKeyspace(this);
         return this;
     }
 

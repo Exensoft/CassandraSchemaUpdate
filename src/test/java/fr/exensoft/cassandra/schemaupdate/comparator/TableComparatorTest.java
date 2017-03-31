@@ -24,9 +24,9 @@ public class TableComparatorTest {
 
         Table targetTable = new Table("test_table")
                 .addColumn(new Column("name", BasicType.TEXT))
-                .addPartitioningKey("name");
-
-        TableComparator tableComparator = new TableComparator(keyspace, null, targetTable);
+                .addPartitioningKey("name")
+                .setKeyspace(keyspace);
+        TableComparator tableComparator = new TableComparator(null, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -44,9 +44,10 @@ public class TableComparatorTest {
 
         Table sourceTable = new Table("test_table")
                 .addColumn(new Column("name", BasicType.TEXT))
-                .addPartitioningKey("name");
+                .addPartitioningKey("name")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, null);
+        TableComparator tableComparator = new TableComparator(sourceTable, null);
 
         DeltaList list = tableComparator.compare();
 
@@ -63,13 +64,15 @@ public class TableComparatorTest {
     public void renamePartitioningKeyColumn() {
         Table sourceTable = new Table("test_table")
                 .addColumn(new Column("name", BasicType.TEXT))
-                .addPartitioningKey("name");
+                .addPartitioningKey("name")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name2", BasicType.TEXT).addOldName("name"))
-                .addPartitioningKey("name2");
+                .addPartitioningKey("name2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -88,15 +91,17 @@ public class TableComparatorTest {
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2_bis", BasicType.TEXT).addOldName("column2"))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2_bis");
+                .addClusteringColumn("column2_bis")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -116,16 +121,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3_bis", BasicType.TEXT).addOldName("column3"))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -150,16 +157,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.INT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.BLOB))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -179,16 +188,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.INT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.VARCHAR))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -213,16 +224,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.BLOB))
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -243,16 +256,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.UUID))
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -277,16 +292,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.INT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.VARINT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -306,16 +323,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.BLOB))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -339,16 +358,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.UUID))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -372,16 +393,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2", SortOrder.ASC);
+                .addClusteringColumn("column2", SortOrder.ASC)
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2", SortOrder.DESC);
+                .addClusteringColumn("column2", SortOrder.DESC)
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -406,7 +429,8 @@ public class TableComparatorTest {
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
                 .addClusteringColumn("column2", SortOrder.ASC)
-                .addClusteringColumn("column3", SortOrder.DESC);
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
@@ -414,9 +438,10 @@ public class TableComparatorTest {
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
                 .addClusteringColumn("column3", SortOrder.DESC)
-                .addClusteringColumn("column2", SortOrder.ASC);
+                .addClusteringColumn("column2", SortOrder.ASC)
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -440,7 +465,8 @@ public class TableComparatorTest {
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
@@ -448,9 +474,10 @@ public class TableComparatorTest {
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addColumn(new Column("column4", BasicType.UUID))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 
@@ -471,16 +498,18 @@ public class TableComparatorTest {
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addColumn(new Column("column4", BasicType.UUID))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
         Table targetTable = new Table("test_table2")
                 .addColumn(new Column("name", BasicType.TEXT))
                 .addColumn(new Column("column2", BasicType.TEXT))
                 .addColumn(new Column("column3", BasicType.TEXT))
                 .addPartitioningKey("name")
-                .addClusteringColumn("column2");
+                .addClusteringColumn("column2")
+                .setKeyspace(keyspace);
 
-        TableComparator tableComparator = new TableComparator(keyspace, sourceTable, targetTable);
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
 
         DeltaList list = tableComparator.compare();
 

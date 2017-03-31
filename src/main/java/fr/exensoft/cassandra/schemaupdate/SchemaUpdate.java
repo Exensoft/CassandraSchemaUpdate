@@ -1,7 +1,7 @@
 package fr.exensoft.cassandra.schemaupdate;
 
 import com.datastax.driver.core.PoolingOptions;
-import fr.exensoft.cassandra.schemaupdate.comparator.SchemaComparator;
+import fr.exensoft.cassandra.schemaupdate.comparator.KeyspaceComparator;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.AbstractDelta;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.DeltaList;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.DeltaResult;
@@ -30,7 +30,7 @@ public class SchemaUpdate {
         Keyspace sourceKeyspace = cassandraConnection.loadKeyspace(targetKeyspace.getName());
 
         // Comparing sourceKeyspace with targetKeyspace
-        return new SchemaComparator(sourceKeyspace, targetKeyspace).compare();
+        return new KeyspaceComparator(sourceKeyspace, targetKeyspace).compare();
     }
 
     private void applyDeltaList(DeltaList deltaList) {

@@ -11,7 +11,10 @@ import fr.exensoft.cassandra.schemaupdate.model.Table;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SchemaComparator {
+/**
+ * Find differences between two keyspaces by returning a delta list.
+ */
+public class KeyspaceComparator {
 
     private Keyspace source;
     private Keyspace target;
@@ -20,7 +23,7 @@ public class SchemaComparator {
 
     private Map<String, DeltaList> tablesDelta;
 
-    public SchemaComparator(Keyspace source, Keyspace target) {
+    public KeyspaceComparator(Keyspace source, Keyspace target) {
         this.source = source;
         this.target = target;
     }
@@ -49,7 +52,7 @@ public class SchemaComparator {
     }
 
     private void compareTables(Table source, Table target) {
-        TableComparator tableComparator = new TableComparator(this.target, source, target);
+        TableComparator tableComparator = new TableComparator(source, target);
         tablesDelta.put(tableComparator.getTableName(), tableComparator.compare());
     }
 
