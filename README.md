@@ -1,5 +1,8 @@
 # Cassandra Schema Update
 
+[![Build Status](https://travis-ci.org/Exensoft/CassandraSchemaUpdate.svg?branch=master)](https://travis-ci.org/Exensoft/CassandraSchemaUpdate)
+[![Coverage Status](https://coveralls.io/repos/github/Exensoft/CassandraSchemaUpdate/badge.svg?branch=master)](https://coveralls.io/github/Exensoft/CassandraSchemaUpdate?branch=master)
+
 1. [Présentation](#presentation)
 2. [Fonctionnement](#fonctionnement)
 
