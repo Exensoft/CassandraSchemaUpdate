@@ -1,7 +1,6 @@
 package fr.exensoft.cassandra.schemaupdate;
 
 import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PoolingOptions;
 import fr.exensoft.cassandra.schemaupdate.comparator.KeyspaceComparator;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.AbstractDelta;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.DeltaList;
@@ -10,8 +9,6 @@ import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,7 +71,7 @@ public class SchemaUpdate {
             return this;
         }
 
-        public Builder withCassandraConnection(CassandraConnection cluster) {
+        public Builder withCassandraConnection(CassandraConnection cassandraConnection) {
             this.cassandraConnection = cassandraConnection;
             return this;
         }

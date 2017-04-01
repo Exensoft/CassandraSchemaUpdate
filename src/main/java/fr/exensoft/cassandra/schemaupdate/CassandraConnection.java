@@ -9,7 +9,6 @@ import fr.exensoft.cassandra.schemaupdate.model.type.ColumnType;
 import fr.exensoft.cassandra.schemaupdate.model.values.IndexOption;
 import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
 import fr.exensoft.cassandra.schemaupdate.utils.CQLTypeConverter;
-import javafx.scene.control.Tab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +61,7 @@ public class CassandraConnection {
 	}
 
 	public void applyDelta(AbstractDelta delta) {
-		ResultSet result = session.execute(delta.generateCQL());
-		LOGGER.info(result.toString());
+		session.execute(delta.generateCQL());
 	}
 
 	public List<String> listKeyspaces() {
@@ -85,12 +83,12 @@ public class CassandraConnection {
 			return null;
 		}
 
-		Keyspace retour = new Keyspace(row.getString("keyspace_name"));
+		Keyspace keyspace = new Keyspace(row.getString("keyspace_name"));
 
-		//Load tables
-		loadTables(name).forEach(retour::addTable);
+		// Load tables
+		loadTables(name).forEach(keyspace::addTable);
 
-		return retour;
+		return keyspace;
 	}
 
 	public List<Table> loadTables(String keyspace_name) {
