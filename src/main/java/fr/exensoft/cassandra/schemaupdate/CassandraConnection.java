@@ -29,31 +29,15 @@ public class CassandraConnection {
 	private Session session = null;
 
 	private Cluster cluster;
-
-	private List<String> contactPoints;
-	private PoolingOptions poolingOptions;
-	private int port;
-
 	private PreparedStatement selectKeyspace;
 	private PreparedStatement selectKeyspaceTables;
 	private PreparedStatement selectTableColumns;
 
-	CassandraConnection(List<String> contactPoints, int port, PoolingOptions poolingOptions) {
-		this.poolingOptions = poolingOptions;
-		this.port = port;
-		this.contactPoints = contactPoints;
+	CassandraConnection(Cluster cluster) {
+		this.cluster = cluster;
 	}
 
 	public void connect() {
-		Cluster.Builder builder= Cluster.builder()
-				.withPoolingOptions(poolingOptions)
-				.withPort(port);
-		
-		contactPoints.stream()
-				.forEach(builder::addContactPoint);
-		
-		cluster = builder.build();
-		
 		session = cluster.connect();
 
 		selectKeyspace = session.prepare("SELECT * FROM system.schema_keyspaces WHERE keyspace_name=?");

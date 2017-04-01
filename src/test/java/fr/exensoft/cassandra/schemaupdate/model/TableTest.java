@@ -1,12 +1,14 @@
 package fr.exensoft.cassandra.schemaupdate.model;
 
 
+import fr.exensoft.cassandra.schemaupdate.SchemaUpdateException;
 import fr.exensoft.cassandra.schemaupdate.model.type.BasicType;
 import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
 import org.junit.Test;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class TableTest {
@@ -46,6 +48,41 @@ public class TableTest {
 
         assertThat(table.getIndex(column4)).isNotNull();
         assertThat(table.getIndex(column4).getName()).isEqualTo("test_table_column4_index");
+    }
+
+    @Test
+    public void tableColumnAlreadyExistsTest() {
+        Column column1 = new Column("column1", BasicType.TEXT);
+        Column column2 = new Column("column2", BasicType.TEXT);
+
+        Table table = new Table("test_table")
+                .addColumn(column1)
+                .addColumn(column2);
+
+        assertThatThrownBy(()->table.addColumn(new Column("column1", BasicType.VARCHAR)))
+                .isInstanceOf(SchemaUpdateException.class);
+    }
+
+    @Test
+    public void tableColumnNotExistsTest() {
+        Column column1 = new Column("column1", BasicType.TEXT);
+        Column column2 = new Column("column2", BasicType.TEXT);
+
+        Table table = new Table("test_table")
+                .addColumn(column1)
+                .addColumn(column2);
+
+        assertThatThrownBy(()->table.addPartitioningKey("other_name"))
+                .isInstanceOf(SchemaUpdateException.class);
+
+        assertThatThrownBy(()->table.addClusteringColumn("other_name"))
+                .isInstanceOf(SchemaUpdateException.class);
+
+        assertThatThrownBy(()->table.addIndex("index_name", "other_name"))
+                .isInstanceOf(SchemaUpdateException.class);
+
+        assertThatThrownBy(()->table.setOrder("other_name", SortOrder.ASC))
+                .isInstanceOf(SchemaUpdateException.class);
     }
 
 }

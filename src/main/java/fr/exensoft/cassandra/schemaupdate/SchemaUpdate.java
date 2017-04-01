@@ -1,5 +1,6 @@
 package fr.exensoft.cassandra.schemaupdate;
 
+import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.PoolingOptions;
 import fr.exensoft.cassandra.schemaupdate.comparator.KeyspaceComparator;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.AbstractDelta;
@@ -20,7 +21,7 @@ public class SchemaUpdate {
     private CassandraConnection cassandraConnection;
 
     private SchemaUpdate(Builder builder) {
-        this.cassandraConnection = new CassandraConnection(builder.contactPoints, builder.port, builder.poolingOptions);
+        this.cassandraConnection = new CassandraConnection(builder.cluster);
         this.cassandraConnection.connect();
     }
 
@@ -61,22 +62,10 @@ public class SchemaUpdate {
     }
 
     public static class Builder {
-        private List<String> contactPoints = new LinkedList<>();
-        private PoolingOptions poolingOptions;
-        private int port = 9042;
+        private Cluster cluster;
 
-        public Builder addContactPoint(String contactPoint) {
-            contactPoints.add(contactPoint);
-            return this;
-        }
-
-        public Builder withPoolingOptions(PoolingOptions poolingOptions) {
-            this.poolingOptions = poolingOptions;
-            return this;
-        }
-
-        public Builder withPort(int port) {
-            this.port = port;
+        public Builder addContactPoint(Cluster cluster) {
+            this.cluster = cluster;
             return this;
         }
 
