@@ -23,11 +23,21 @@ public class KeyspaceComparator {
 
     private Map<String, DeltaList> tablesDelta;
 
+    /**
+     * Create a new Keyspace comparator.
+     *
+     * @param source
+     * @param target
+     */
     public KeyspaceComparator(Keyspace source, Keyspace target) {
         this.source = source;
         this.target = target;
     }
 
+    /**
+     * Find differences between source keyspace and target keyspace
+     * (only keyspace differences, not differences in tables of keyspaces)
+     */
     private void compareKeyspaces() {
         keyspaceDelta = new DeltaList();
 
@@ -43,7 +53,7 @@ public class KeyspaceComparator {
         }
 
         //Detect keyspace name change
-        if(source != null && target == null) {
+        if(source != null && target != null && !source.getName().equals(target.getName())) {
             keyspaceDelta.addDelta(new DropKeyspaceDelta(source));
             keyspaceDelta.addDelta(new CreateKeyspaceDelta(target));
             keyspaceDelta.addFlag(DeltaFlag.DATA_LOSS);
@@ -51,11 +61,21 @@ public class KeyspaceComparator {
 
     }
 
+    /**
+     * Find differences between source table and target table by using a TableComparator
+     * @param source
+     * @param target
+     */
     private void compareTables(Table source, Table target) {
         TableComparator tableComparator = new TableComparator(source, target);
         tablesDelta.put(tableComparator.getTableName(), tableComparator.compare());
     }
 
+    /**
+     * Find differences between source keyspace and target keyspace and their tables
+     *
+     * @return A DeltaResult instance that will describe differences for each structure of keyspaces
+     */
     public DeltaResult compare() {
         tablesDelta = new HashMap<>();
 

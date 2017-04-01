@@ -14,6 +14,7 @@ public class CQLTypeUtilsTest {
         assertThat(CQLTypeUtils.isCompatible(BasicType.VARCHAR, BasicType.TEXT)).isTrue();
         assertThat(CQLTypeUtils.isCompatible(BasicType.INT, BasicType.VARINT)).isTrue();
         assertThat(CQLTypeUtils.isCompatible(BasicType.INT, BasicType.BLOB)).isTrue();
+        assertThat(CQLTypeUtils.isCompatible(BasicType.TIMEUUID, BasicType.UUID)).isTrue();
 
 
         assertThat(CQLTypeUtils.isCompatible(BasicType.VARINT, BasicType.INT)).isFalse();
@@ -138,6 +139,7 @@ public class CQLTypeUtilsTest {
         assertThat(CQLTypeUtils.equals(BasicType.INT, new ListType(BasicType.INT))).isFalse();
         assertThat(CQLTypeUtils.equals(BasicType.INT, new SetType(BasicType.INT))).isFalse();
         assertThat(CQLTypeUtils.equals(new SetType(BasicType.INT), new FrozenType(new SetType(BasicType.INT)))).isFalse();
+        assertThat(CQLTypeUtils.equals(new FrozenType(BasicType.INT), new SetType(new SetType(BasicType.INT)))).isFalse();
     }
 
 
