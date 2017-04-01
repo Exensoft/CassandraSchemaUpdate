@@ -78,6 +78,9 @@ public class TableTest {
         assertThatThrownBy(()->table.addClusteringColumn("other_name"))
                 .isInstanceOf(SchemaUpdateException.class);
 
+        assertThatThrownBy(()->table.addClusteringColumn("other_name", SortOrder.DESC))
+                .isInstanceOf(SchemaUpdateException.class);
+
         assertThatThrownBy(()->table.addIndex("index_name", "other_name"))
                 .isInstanceOf(SchemaUpdateException.class);
 

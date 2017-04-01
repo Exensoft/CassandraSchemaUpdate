@@ -27,8 +27,10 @@ public class CassandraConnection {
 	private final static Logger LOGGER = LoggerFactory.getLogger(CassandraConnection.class);
 
 	private Session session = null;
-
 	private Cluster cluster;
+
+	private boolean isConnected = false;
+
 	private PreparedStatement selectKeyspace;
 	private PreparedStatement selectKeyspaceTables;
 	private PreparedStatement selectTableColumns;
@@ -38,14 +40,23 @@ public class CassandraConnection {
 	}
 
 	public void connect() {
-		session = cluster.connect();
+		if(isConnected) {
+			return;
+		}
+		isConnected = true;
 
+		session = cluster.connect();
 		selectKeyspace = session.prepare("SELECT * FROM system.schema_keyspaces WHERE keyspace_name=?");
 		selectKeyspaceTables = session.prepare("SELECT * FROM system.schema_columnfamilies WHERE keyspace_name=?");
 		selectTableColumns = session.prepare("SELECT * FROM system.schema_columns WHERE keyspace_name=? AND columnfamily_name=?");
 	}
 
 	public void close() {
+		if(!isConnected) {
+			return;
+		}
+		isConnected = false;
+
 		session.close();
 		cluster.close();
 	}

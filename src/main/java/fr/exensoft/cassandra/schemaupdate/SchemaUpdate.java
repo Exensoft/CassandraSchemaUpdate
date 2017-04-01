@@ -14,6 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * SchemaUpdate  
+ */
 public class SchemaUpdate {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SchemaUpdate.class);
@@ -21,8 +24,8 @@ public class SchemaUpdate {
     private CassandraConnection cassandraConnection;
 
     private SchemaUpdate(Builder builder) {
-        this.cassandraConnection = new CassandraConnection(builder.cluster);
-        this.cassandraConnection.connect();
+        cassandraConnection = builder.cassandraConnection;
+        cassandraConnection.connect();
     }
 
 
@@ -64,12 +67,25 @@ public class SchemaUpdate {
     public static class Builder {
         private Cluster cluster;
 
-        public Builder addContactPoint(Cluster cluster) {
+        private CassandraConnection cassandraConnection;
+
+        public Builder withCluster(Cluster cluster) {
             this.cluster = cluster;
             return this;
         }
 
+        public Builder withCassandraConnection(CassandraConnection cluster) {
+            this.cassandraConnection = cassandraConnection;
+            return this;
+        }
+
         public SchemaUpdate build() {
+            if(cassandraConnection == null) {
+                if(cluster == null) {
+                    throw new SchemaUpdateException("You must define a Cluster or a CassandraConnection object");
+                }
+                cassandraConnection = new CassandraConnection(cluster);
+            }
             return new SchemaUpdate(this);
         }
     }

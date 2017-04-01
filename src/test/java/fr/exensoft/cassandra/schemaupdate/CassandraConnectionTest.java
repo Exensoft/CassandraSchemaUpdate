@@ -78,7 +78,7 @@ public class CassandraConnectionTest {
                 createTableColumnRow("column2", 1, "", "", "", "clustering_key", "org.apache.cassandra.db.marshal.UTF8Type"),
                 createTableColumnRow("column3", 2, "", "", "", "clustering_key", "org.apache.cassandra.db.marshal.ReversedType(org.apache.cassandra.db.marshal.Int32Type)"),
                 createTableColumnRow("column4", 0, "", "", "", "", "org.apache.cassandra.db.marshal.UTF8Type"),
-                createTableColumnRow("column5", 0, "", "", "", "", "org.apache.cassandra.db.marshal.UTF8Type")
+                createTableColumnRow("column5", 0, "test_index", "{}", "COMPOSITES", "", "org.apache.cassandra.db.marshal.UTF8Type")
         ));
 
         Mockito.doAnswer((params)->{
@@ -166,6 +166,7 @@ public class CassandraConnectionTest {
         assertThat(table1.getColumn("column2").getType()).isEqualTo(new SetType(BasicType.TEXT));
         assertThat(table1.getClusteringColumns()).isEmpty();
         assertThat(table1.getPartitioningKeys()).containsOnly(table1.getColumn("column1"));
+        assertThat(table1.getIndexes()).isEmpty();
 
         Table table2 = keyspace.getTable("table2");
         assertThat(table2.getColumns()).hasSize(5);
@@ -183,6 +184,8 @@ public class CassandraConnectionTest {
         assertThat(table2.getClusteringColumns()).containsOnly(table2.getColumn("column2"), table2.getColumn("column3"));
         assertThat(table2.getSortOrders().get(table2.getColumn("column2"))).isEqualTo(SortOrder.ASC);
         assertThat(table2.getSortOrders().get(table2.getColumn("column3"))).isEqualTo(SortOrder.DESC);
+        assertThat(table2.getIndexes()).hasSize(1);
+        assertThat(table2.getIndex(table2.getColumn("column5")).getName()).isEqualTo("test_index");
     }
 
 }
