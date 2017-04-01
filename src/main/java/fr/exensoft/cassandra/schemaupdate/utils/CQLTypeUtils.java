@@ -8,6 +8,12 @@ import java.util.List;
 
 public class CQLTypeUtils {
 
+    /**
+     * Simplify the column type
+     * (Varchar is converted to Text)
+     * @param type
+     * @return
+     */
     private static ColumnType simplifyType(ColumnType type) {
         if(type == BasicType.VARCHAR) {
             return BasicType.TEXT;
@@ -16,6 +22,12 @@ public class CQLTypeUtils {
         return type;
     }
 
+    /**
+     * Check if types are compatible (if we can alter type1 to type2)
+     * @param type1 Source type
+     * @param type2 Target type
+     * @return
+     */
     public static boolean isCompatible(ColumnType type1, ColumnType type2) {
         if((type1 instanceof BasicType) && (type2 instanceof BasicType)) {
             type1 = simplifyType(type1);
@@ -62,6 +74,12 @@ public class CQLTypeUtils {
         }
     }
 
+    /**
+     * Check if types are order compatible (if we can alter type1 to type2)
+     * @param type1 Source type
+     * @param type2 Target type
+     * @return
+     */
     public static boolean isOrderCompatible(ColumnType type1, ColumnType type2) {
         if((type1 instanceof BasicType) && (type2 instanceof BasicType)) {
             type1 = simplifyType(type1);
@@ -95,6 +113,12 @@ public class CQLTypeUtils {
         }
     }
 
+    /**
+     * Check if types are equivalents
+     * @param type1
+     * @param type2
+     * @return
+     */
     public static boolean equals(ColumnType type1, ColumnType type2) {
         if((type1 instanceof BasicType) && (type2 instanceof BasicType)) {
             return simplifyType(type1).equals(simplifyType(type2));
