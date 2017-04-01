@@ -7,6 +7,9 @@ import sun.reflect.generics.tree.BaseType;
 
 import java.util.*;
 
+/**
+ * Table object represents a Cassandra table with its columns and its indexes.
+ */
 public class Table {
 
     private String name;
@@ -25,6 +28,10 @@ public class Table {
 
     private Keyspace keyspace;
 
+    /**
+     * Creates a new table with the name given in parameters
+     * @param name Table name
+     */
     public Table(String name) {
         this.name = name;
         this.columns = new ArrayList<>();
@@ -34,34 +41,71 @@ public class Table {
         this.indexes = new ArrayList<>();
     }
 
+    /**
+     * Returns the name of the table
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the columns of the table
+     * @return
+     */
     public List<Column> getColumns() {
         return columns;
     }
 
+    /**
+     * Returns the partitionning key columns
+     * @return
+     */
     public List<Column> getPartitioningKeys() {
         return partitioningKeys;
     }
+
+    /**
+     * Returns the clustering key columns
+     * @return
+     */
     public List<Column> getClusteringColumns() {
         return clusteringColumns;
     }
 
+    /**
+     * Returns the indexes (on non key columns)
+     * @return
+     */
     public List<Index> getIndexes() {
         return indexes;
     }
 
+    /**
+     * Returns the keyspace of the table
+     * @return
+     */
     public Keyspace getKeyspace() {
         return keyspace;
     }
 
+    /**
+     * Set the keyspace of the table, the keyspace is automatically set when you add the
+     * table in a Keyspace object (by using addTable method)
+     * @param keyspace
+     * @return
+     */
     public Table setKeyspace(Keyspace keyspace) {
         this.keyspace = keyspace;
         return this;
     }
 
+    /**
+     * Add a new column in the table.
+     * If a column with the same name exists already, a SchemaUpdateException will be thrown.
+     * @param column The new column to add
+     * @return The table object itself (allow you to chain the addColumn calls)
+     */
     public Table addColumn(Column column) {
         if(hasColumn(column.getName())) {
             throw new SchemaUpdateException(String.format("Table \"%s\" already has a column with name \"%s\"", name, column.getName()));
@@ -72,6 +116,12 @@ public class Table {
         return this;
     }
 
+    /**
+     * Add a column in the partitioning key.
+     * You must add the column in the table before.
+     * @param columnName
+     * @return
+     */
     public Table addPartitioningKey(String columnName) {
         Column column = getColumn(columnName);
         if(column == null) {
@@ -82,6 +132,12 @@ public class Table {
         return this;
     }
 
+    /**
+     * Add a column in the clustering columns, the default sort order (ASC) will be used
+     * You must add the column in the table before.
+     * @param columnName
+     * @return
+     */
     public Table addClusteringColumn(String columnName) {
         Column column = getColumn(columnName);
         if(column == null) {
@@ -95,6 +151,13 @@ public class Table {
         return this;
     }
 
+    /**
+     * Add a column in the clustering columns with the specified sort order
+     * You must add the column in the table before.
+     * @param columnName
+     * @param sortOrder
+     * @return
+     */
     public Table addClusteringColumn(String columnName, SortOrder sortOrder) {
         Column column = getColumn(columnName);
         if(column == null) {
@@ -106,10 +169,27 @@ public class Table {
         return this;
     }
 
+    /**
+     * Add index to the specified column.
+     * You can not add index on clustering columns or partitioning key
+     * You must add the column in the table before.
+     * @param name Name of the index
+     * @param columnName Name of the column
+     * @return
+     */
     public Table addIndex(String name, String columnName) {
         return addIndex(name, columnName, IndexOption.VALUES);
     }
 
+    /**
+     * Add index to the specified column.
+     * You can not add index on clustering columns or partitioning key
+     * You must add the column in the table before.
+     * @param name Name of the index
+     * @param columnName Name of the column
+     * @param indexOption Index option to use, when column type is a map you can specify if you want a key based index or a value based index
+     * @return
+     */
     public Table addIndex(String name, String columnName, IndexOption indexOption) {
         Column column = getColumn(columnName);
         if(column == null) {
@@ -125,6 +205,12 @@ public class Table {
         return this;
     }
 
+    /**
+     * Set sort order of a clustering column
+     * @param columnName Name of the clustering column
+     * @param sortOrder Sort order to set for this column
+     * @return
+     */
     public Table setOrder(String columnName, SortOrder sortOrder) {
         Column column = getColumn(columnName);
         if(column == null) {
@@ -136,10 +222,25 @@ public class Table {
         return this;
     }
 
+    /**
+     * Returns the map of clustering columns sort orders
+     * @return
+     */
     public Map<Column, SortOrder> getSortOrders() {
         return sortOrders;
     }
 
+    /**
+     * Validate the table.
+     * Order columns (partitioning columns first then clustering columns and finally "normal" columns)
+     *
+     * In the future, this method will check the table consistency :
+     *  - Check if partitioning key columns are not part of clustering columns
+     *  - Check if clustering columns are not part of the partitioning key
+     *  - Check if clustering columns and partitioning key have no indexes
+     *  - Check column type consistency
+     *  ...
+     */
     public void validate() {
         //Reorganize columns order
         Collections.sort(columns, (a,b)->{
@@ -156,6 +257,11 @@ public class Table {
         });
     }
 
+    /**
+     * Returns a column of the table by its name
+     * @param name
+     * @return
+     */
     public Column getColumn(String name) {
         return columns.stream()
                 .filter(c->c.getName().equals(name))
@@ -163,6 +269,11 @@ public class Table {
                 .orElse(null);
     }
 
+    /**
+     * Returns an index of the table by its column
+     * @param column
+     * @return
+     */
     public Index getIndex(Column column) {
         return indexes.stream()
                 .filter(i->i.getColumn() == column)
@@ -170,7 +281,11 @@ public class Table {
                 .orElse(null);
     }
 
-
+    /**
+     * Check if the table has a column with the given name
+     * @param name
+     * @return
+     */
     private boolean hasColumn(String name) {
         return columns.stream()
                 .anyMatch(c->c.getName().equals(name));
@@ -192,6 +307,12 @@ public class Table {
         sb.append("\tClustering keys : \n");
         for(Column column : clusteringColumns) {
             sb.append("\t\t - ").append(column.getName()).append(" (").append(sortOrders.get(column)).append(")\n");
+        }
+        if(!indexes.isEmpty()) {
+            sb.append("\tIndexes : \n");
+            for(Index index : indexes) {
+                sb.append("\t\t - ").append(index.getName()).append(" (").append(index.getColumn().getName()).append(")\n");
+            }
         }
 
         return sb.toString();

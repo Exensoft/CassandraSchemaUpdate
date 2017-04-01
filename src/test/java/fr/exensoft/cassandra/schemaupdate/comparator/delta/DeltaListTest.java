@@ -4,6 +4,8 @@ package fr.exensoft.cassandra.schemaupdate.comparator.delta;
 import fr.exensoft.cassandra.schemaupdate.comparator.TableComparator;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.columns.*;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.enums.DeltaFlag;
+import fr.exensoft.cassandra.schemaupdate.comparator.delta.enums.DeltaType;
+import fr.exensoft.cassandra.schemaupdate.comparator.delta.enums.ElementType;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.table.CreateTableDelta;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.table.DropTableDelta;
 import fr.exensoft.cassandra.schemaupdate.model.Column;
@@ -111,6 +113,30 @@ public class DeltaListTest {
 
         deltaList.sort();
         assertThat(deltaList.getDeltas()).containsExactly(dropIndex, dropColumn, createColumn, createIndex);
+
+    }
+
+    @Test
+    public void hasDeltaTest() {
+        DeltaList deltaList = new DeltaList();
+
+
+        assertThat(deltaList.hasDelta(ElementType.COLUMN, DeltaType.DROP)).isFalse();
+        assertThat(deltaList.hasDelta(ElementType.COLUMN, DeltaType.CREATE_INDEX)).isFalse();
+
+        // Add a delta
+        DropColumnDelta dropColumn = new DropColumnDelta(new Keyspace("test"), new Table("table"), new Column("test", BasicType.VARINT));
+        CreateIndexDelta createIndex = new CreateIndexDelta(new Keyspace("test"), new Table("table"), new Column("test", BasicType.VARINT), new Column("test", BasicType.VARINT));
+
+        deltaList.addDelta(dropColumn);
+        deltaList.addDelta(createIndex);
+
+        assertThat(deltaList.hasDelta(ElementType.COLUMN, DeltaType.DROP)).isTrue();
+        assertThat(deltaList.hasDelta(ElementType.COLUMN, DeltaType.CREATE_INDEX)).isTrue();
+
+        assertThat(deltaList.hasDelta(ElementType.KEYSPACE, DeltaType.DROP)).isFalse();
+        assertThat(deltaList.hasDelta(ElementType.TABLE, DeltaType.DROP)).isFalse();
+        assertThat(deltaList.hasDelta(ElementType.COLUMN, DeltaType.CREATE)).isFalse();
 
     }
 }

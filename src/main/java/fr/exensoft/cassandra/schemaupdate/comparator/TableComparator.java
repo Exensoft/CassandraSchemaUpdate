@@ -205,12 +205,13 @@ public class TableComparator {
 
         //Find added indexes (present in target table but not in source table)
         for(Column targetColumn : target.getColumns()) {
-            Index targetIndex = source.getIndex(targetColumn);
+            Index targetIndex = target.getIndex(targetColumn);
+
             Index sourceIndex = null;
 
             Column sourceColumn = source.getColumn(targetColumn.getName());
             if(sourceColumn != null) {
-                sourceIndex = target.getIndex(sourceColumn);
+                sourceIndex = source.getIndex(sourceColumn);
             }
 
             if(targetIndex == null) {
@@ -389,6 +390,13 @@ public class TableComparator {
      * @return A DeltaList object that describe the operations to apply
      */
     public DeltaList compare() {
+        if(source != null) {
+            source.validate();
+        }
+        if(target != null) {
+            target.validate();
+        }
+
         DeltaList delta = new DeltaList();
 
         if(source == null && target != null) {

@@ -31,6 +31,8 @@ public class Keyspace {
     }
 
     public Keyspace addTable(Table table) {
+        table.validate();
+
         tables.add(table);
         table.setKeyspace(this);
         return this;

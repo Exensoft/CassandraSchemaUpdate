@@ -10,6 +10,7 @@ import fr.exensoft.cassandra.schemaupdate.model.Column;
 import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
 import fr.exensoft.cassandra.schemaupdate.model.Table;
 import fr.exensoft.cassandra.schemaupdate.model.type.BasicType;
+import fr.exensoft.cassandra.schemaupdate.model.type.MapType;
 import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
 import org.junit.Test;
 
@@ -520,5 +521,317 @@ public class TableComparatorTest {
         assertThat(list.getDeltas().get(0)).isInstanceOf(DropColumnDelta.class);
         assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
         assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getTarget()).isNull();
+    }
+
+    @Test
+    public void noChangesTest() {
+        Table sourceTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addColumn(new Column("column5", new MapType(BasicType.INT, BasicType.TEXT)))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .setKeyspace(keyspace);
+
+        Table targetTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addColumn(new Column("column5", new MapType(BasicType.INT, BasicType.TEXT)))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .setKeyspace(keyspace);
+
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
+
+        DeltaList list = tableComparator.compare();
+
+        assertThat(list.hasUpdate()).isFalse();
+        assertThat(list.getFlags()).isEmpty();
+    }
+
+    @Test
+    public void columnOrderChangesTest() {
+        Table sourceTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addColumn(new Column("column5", new MapType(BasicType.INT, BasicType.TEXT)))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .setKeyspace(keyspace);
+
+        Table targetTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column5", new MapType(BasicType.INT, BasicType.TEXT)))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .setKeyspace(keyspace);
+
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
+
+        DeltaList list = tableComparator.compare();
+
+        assertThat(list.hasUpdate()).isFalse();
+        assertThat(list.getFlags()).containsOnly(DeltaFlag.ORDER_CHANGED);
+    }
+
+    @Test
+    public void createIndexTest() {
+        Table sourceTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addColumn(new Column("column5", new MapType(BasicType.INT, BasicType.TEXT)))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .setKeyspace(keyspace);
+
+        Table targetTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addColumn(new Column("column5", new MapType(BasicType.INT, BasicType.TEXT)))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
+
+        DeltaList list = tableComparator.compare();
+
+        assertThat(list.hasUpdate()).isTrue();
+        assertThat(list.getFlags()).isEmpty();
+        assertThat(list.getDeltas()).hasSize(1);
+
+        assertThat(list.getDeltas().get(0)).isInstanceOf(CreateIndexDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+    }
+
+    @Test
+    public void dropIndexTest() {
+        Table sourceTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addColumn(new Column("column5", new MapType(BasicType.INT, BasicType.TEXT)))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        Table targetTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addColumn(new Column("column5", new MapType(BasicType.INT, BasicType.TEXT)))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .setKeyspace(keyspace);
+
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
+
+        DeltaList list = tableComparator.compare();
+
+        assertThat(list.hasUpdate()).isTrue();
+        assertThat(list.getFlags()).isEmpty();
+        assertThat(list.getDeltas()).hasSize(1);
+
+        assertThat(list.getDeltas().get(0)).isInstanceOf(DropIndexDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+    }
+
+    @Test
+    public void changeIndexNameTest() {
+        Table sourceTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        Table targetTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.UUID))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index_2", "column4")
+                .setKeyspace(keyspace);
+
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
+
+        DeltaList list = tableComparator.compare();
+
+        assertThat(list.hasUpdate()).isTrue();
+        assertThat(list.getFlags()).isEmpty();
+        assertThat(list.getDeltas()).hasSize(2);
+
+        assertThat(list.getDeltas().get(0)).isInstanceOf(DropIndexDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+
+        assertThat(list.getDeltas().get(1)).isInstanceOf(CreateIndexDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(1)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(1)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+    }
+
+    @Test
+    public void alterIndexColumnTypeTest_OrderCompatible() {
+        Table sourceTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.INT))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        Table targetTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.VARINT))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
+
+        DeltaList list = tableComparator.compare();
+
+        assertThat(list.hasUpdate()).isTrue();
+        assertThat(list.getFlags()).isEmpty();
+        assertThat(list.getDeltas()).hasSize(1);
+
+        assertThat(list.getDeltas().get(0)).isInstanceOf(AlterTypeColumnDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+    }
+
+    @Test
+    public void alterIndexColumnTypeTest_NotOrderCompatible() {
+        Table sourceTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.TEXT))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        Table targetTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.BLOB))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
+
+        DeltaList list = tableComparator.compare();
+
+        assertThat(list.hasUpdate()).isTrue();
+        assertThat(list.getFlags()).isEmpty();
+        assertThat(list.getDeltas()).hasSize(3);
+
+        assertThat(list.getDeltas().get(0)).isInstanceOf(DropIndexDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+
+        assertThat(list.getDeltas().get(1)).isInstanceOf(AlterTypeColumnDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(1)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(1)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+
+        assertThat(list.getDeltas().get(2)).isInstanceOf(CreateIndexDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(2)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(2)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+    }
+
+    @Test
+    public void alterIndexColumnTypeTest_NotCompatible() {
+        Table sourceTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.TEXT))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        Table targetTable = new Table("test_table")
+                .addColumn(new Column("name", BasicType.TEXT))
+                .addColumn(new Column("column2", BasicType.TEXT))
+                .addColumn(new Column("column3", BasicType.TEXT))
+                .addColumn(new Column("column4", BasicType.INT))
+                .addPartitioningKey("name")
+                .addClusteringColumn("column2")
+                .addClusteringColumn("column3", SortOrder.DESC)
+                .addIndex("test_table_column4_index", "column4")
+                .setKeyspace(keyspace);
+
+        TableComparator tableComparator = new TableComparator(sourceTable, targetTable);
+
+        DeltaList list = tableComparator.compare();
+
+        assertThat(list.hasUpdate()).isTrue();
+        assertThat(list.getFlags()).contains(DeltaFlag.DATA_LOSS);
+        assertThat(list.getDeltas()).hasSize(4);
+
+        assertThat(list.getDeltas().get(0)).isInstanceOf(DropIndexDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(0)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+
+        assertThat(list.getDeltas().get(1)).isInstanceOf(DropColumnDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(1)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(1)).getTarget()).isNull();
+
+        assertThat(list.getDeltas().get(2)).isInstanceOf(CreateColumnDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(2)).getSource()).isNull();
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(2)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
+
+        assertThat(list.getDeltas().get(3)).isInstanceOf(CreateIndexDelta.class);
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(3)).getSource()).isEqualTo(sourceTable.getColumn("column4"));
+        assertThat(((ColumnAbstractDelta) list.getDeltas().get(3)).getTarget()).isEqualTo(targetTable.getColumn("column4"));
     }
 }
