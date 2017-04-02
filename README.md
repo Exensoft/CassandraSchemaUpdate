@@ -22,7 +22,7 @@ Cette librairie permet de réaliser simplement les actions suivantes sur une bas
 
 ## Fonctionnement
 
-###Décrire les éléments
+### Décrire les éléments
 Pour utiliser CassandraSchemaUpdate, il faut dans un premier temps savoir décrire le schéma que l'on veut créer. 
 Un schéma se compose principalement des éléments suivants : `Keyspace`, `Table`et `Column`. Nous allons voir comment décrire ces structures.
 
@@ -34,7 +34,7 @@ Column column = new Column("name", BasicType.INT);
 
 Les types basiques disponibles sont les suivants : 
 | Type Cassandra   |    Constante associée |
-|------------------|-----------------------|
+| ---------------- | --------------------- |
 | `ascii`          | `BasicType.ASCII`     |
 | `bigint`         | `BasicType.BIGINT`    |
 | `blob`           | `BasicType.BLOB`      |
