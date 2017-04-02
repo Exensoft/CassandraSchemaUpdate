@@ -8,7 +8,7 @@
 	1. [Décrire les éléments](#décrire-les-éléments)
 		1. [Décrire une colonne](#décrire-une-colonne)
 		2. [Décrire une table](#décrire-une-table)
-		3. Décrire un keyspace
+		3. [Décrire un keyspace](#décrire-un-keyspace)
 	2. Créer un patch et l'exécuter
 
 ## Présentation
@@ -93,25 +93,40 @@ table.addPartitioningKey("column_name");
 Voici comment créer une table simple :
 
 ```java
-/**
-	Table à créer : 
-  CREATE TABLE users (
-    user_name varchar PRIMARY KEY,
-    password varchar,
-    gender varchar,
-    session_token varchar,
-    state varchar,
-    birth_year bigint
-  );
-*/
 
 Table table = new Table("users")
       .addColumn(new Column("user_name", BasicType.VARCHAR))
       .addColumn(new Column("password", BasicType.VARCHAR))
-      .addColumn(new Column("gender", BasicType.VARCHAR))
-      .addColumn(new Column("session_token", BasicType.VARCHAR))
-      .addColumn(new Column("state", BasicType.VARCHAR))
-      .addColumn(new Column("birth_year", BasicType.VARCHAR))
-      .addColumn(new Column("state", BasicType.VARCHAR))
+      .addColumn(new Column("mail", BasicType.VARCHAR))
       .addPartitioningKey("user_name");
 ```
+
+
+Il est également possible de définir une clustering colum. Il faut utiliser la méthode `addClusteringColumn` :
+```java
+table.addClusteringColumn("column_name");
+```
+Par défaut, les valeurs d'une clustering column sont triées par ordre croissant. Si vous souhaitez passer à un ordre décroissant vous pouvez le préciser lors de la déclaration de la clustering column :
+```java
+table.addClusteringColumn("column_name", SortOrder.DESC)
+```
+
+Il est également possible de déclarer un index sur une colonne qui ne fait pas partie de la partitionning key ni des clustering columns.
+Il faut utiliser la méthode `addIndex`, elle prend en premier paramètre le nom de l'index que vous souhaitez créer en second paramètre le nom de la colonne sur laquelle l'index doit être placé.
+```java
+table.addIndex("index_name", "column_name");
+```
+
+#### Décrire un Keyspace
+
+Le Keyspace va contenir les différentes tables de votre schéma. Pour le décrire, il faut utiliser la classe `Keyspace` en spécifiant le nom que vous souhaitez donner à votre keyspace en paramètre :
+
+```java
+Keyspace keyspace = new Keyspace("keyspace_name");
+```
+
+Vous pouvez ensuite ajouter des tables à votre keyspace :
+```java
+keyspace.addTable(table);
+```
+### Créer un patch et l'exécuter
