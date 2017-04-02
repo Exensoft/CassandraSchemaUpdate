@@ -10,6 +10,9 @@
 		2. [Décrire une table](#décrire-une-table)
 		3. [Décrire un keyspace](#décrire-un-keyspace)
 	2. [Créer un patch et l'exécuter](#créer-un-patch-et-lexécuter)
+		1. [Créer un patch](#créer-un-patch)
+		2. [Explorer un patch](#explorer-un-patch)
+		3. [Exécuter un patch](#exécuter-un-patch)
 
 ## Présentation
 Cette librairie permet de réaliser simplement les actions suivantes sur une base de données Cassandra :
@@ -139,5 +142,117 @@ Classiquement, CassandraSchemaUpdate fonctionne en trois grande étapes :
 
 Nous avons choisi de séparer la création du patch de son application car il peut arriver que certains patch entraînent une perte de données. Nous avons donc préféré mettre à disposition des méthodes permettant d'explorer le patch et de vérifier où se situent les pertes de données si il y en a.
 
-#### Création du patch
+#### Créer un patch
 Pour créer un patch, il faut dans un premier temps créer une instance de `SchemaUpdate`.
+
+On commence par configurer une connexion à Cassandra :
+```java
+Cluster cluster = Cluster.builder()
+		.withPort(9042)
+		.addContactPoint("localhost")
+		.build();
+```
+Et on crée ensuite notre instance :
+```java
+SchemaUpdate schemaUpdate = new SchemaUpdate.Builder()
+		.withCluster(cluster)
+		.build();
+```
+
+Pour créer un patch il faut que vous ayez au préalable définit le `Keyspace` cible que vous souhaitez obtenir. Il suffit ensuite d'appeler la méthode `createPatch` :
+
+```java
+DeltaResult patch  = schemaUpdate.createPatch(targetKeyspace);
+```
+L'objet `DeltaResult` retourné contient le patch à exécuter pour obtenir le keyspace cible dans votre base Cassandra.
+
+#### Explorer un patch
+Il est possible d'obtenir des informations sur le patch qui a été créé par le `SchemaUpdate`, par exemple on peut vérifier si le patch contient des opérations à effectuer ou si le schéma existant correspond déjà au schéma cible :
+```java
+//On vérifie si on a des mises à jour à effectuer
+if(patch.hasUpdate()) {
+	System.out.println("Le patch contient des mises à jour");
+}
+```
+
+On peut aussi savoir simplement si le patch contient des opérations qui risquent d'engendrer une perte de données :
+```java
+if(patch.hasFlag(DeltaFlag.DATA_LOSS)) {
+	System.out.println("Attention, l'exécution de ce patch risque d'engendrer une pertede données");
+}
+```
+
+Il est également possible d'aller plus loin dans l'exploration des modifications décrites dans le patch.
+L'objet `DeltaResult`est organisé en deux grandes parties : 
+
+ * Description des modifications sur le keyspace
+ * Description des modifications sur les différentes tables
+
+Les modifications sur les différentes structures sont modélisées sous forme de `DeltaList`, elles contiennent les opérations "élémentaires" (1 opération = 1 requête CQL) à exécuter sur le cluster pour obtenir le schéma cible.
+
+On peut récupérer la DeltaList des opérations à exécuter sur le keyspace de la manière suivante :
+```java
+DeltaList keyspaceDelta = patch.getKeyspaceDelta();
+```
+
+On peut récupérer la liste des opérations à exécuter sur une table de la manière suivante :
+```java
+DeltaList tableDelta = patch.getTablesDelta().get("table_name");
+```
+
+Les `DeltaList` permettent l'utilisation des méthode `hasUpdate` et `hasFlag` de la même manière que les `DeltaResult` :
+```java
+DeltaList tableDelta = patch.getTablesDelta().get("table_name");
+
+if(tableDelta.hasUpdate()) {
+	System.out.println("La table table_name doit être mise à jour");
+}
+
+if(tableDelta.hasFlag(DeltaFlag.DATA_LOSS)) {
+	System.out.println("La mise à jour de la table table_name va engendrer une perte de données");
+}
+```
+
+#### Exécuter un patch
+Lorsque vous avez vérifié si le patch généré peut être exécuté sans crainte pour votre application, vous pouvez l'appliquer en utilisant la méthode `applyPatch` :
+
+```java
+schemaUpdate.applyPatch(patch);
+```
+
+Après avoir mis à jour votre schéma, il ne faut pas oublier de fermer la connexion :
+```java
+schemaUpdate.close();
+```
+
+## Exemples
+
+### Création d'un schéma
+```java
+Keyspace keyspace = new Keyspace("my_application")
+		.addTable(new Table("users")
+				.addColumn(new Column("login", BasicType.VARCHAR))
+				.addColumn(new Column("password", BasicType.VARCHAR))
+				.addColumn(new Column("mail", BasicType.VARCHAR))
+				.addPartitioningKey("login"))
+		.addTable(new Table("messages")
+				.addColumn(new Column("id", BasicType.UUID))
+				.addColumn(new Column("user1_login", BasicType.VARCHAR))
+				.addColumn(new Column("user2_login", BasicType.VARCHAR))
+				.addColumn(new Column("date", BasicType.VARCHAR))
+				.addColumn(new Column("content", BasicType.VARCHAR))
+				.addPartitioningKey("id")
+				.addIndex("messages_user1_login_index", "user1_login")
+				.addIndex("messages_user2_login_index", "user2_login"));
+
+SchemaUpdate schemaUpdate = new SchemaUpdate.Builder()
+		.withCluster(new Cluster.Builder()
+				.withPort(9042)
+				.addContactPoint("localhost")
+				.build())
+		.build();
+
+DeltaResult patch = schemaUpdate.createPatch(keyspace);
+
+schemaUpdate.applyPatch(patch);
+```
