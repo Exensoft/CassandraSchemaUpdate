@@ -158,4 +158,16 @@ public class SchemaUpdateTest {
 
         Mockito.verify(cassandraConnection, Mockito.times(0)).applyDelta(Mockito.any());
     }
+    @Test
+    public void closeTest_BuilderWithCassandraConnection() {
+        CassandraConnection cassandraConnection = Mockito.mock(CassandraConnection.class);
+
+        SchemaUpdate schemaUpdate = new SchemaUpdate.Builder()
+                .withCassandraConnection(cassandraConnection)
+                .build();
+
+        schemaUpdate.close();
+
+        Mockito.verify(cassandraConnection, Mockito.times(1)).close();
+    }
 }
