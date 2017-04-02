@@ -49,6 +49,16 @@ public class CQLTypeConverterTest {
                 CQLTypeConverter.validatorToType("org.apache.cassandra.db.marshal.SetType)org.apache.cassandra.db.marshal.BytesType,org.apache.cassandra.db.marshal.BytesType)"))
                 .isInstanceOf(SchemaUpdateException.class)
                 .hasMessageContaining("Invalid validator");
+
+        assertThatThrownBy(()->
+                CQLTypeConverter.validatorToType("org.apache.cassandra.db.marshal.SetType(org.apache.cassandra.db.marshal.BytesType"))
+                .isInstanceOf(SchemaUpdateException.class)
+                .hasMessageContaining("Invalid validator");
+
+        assertThatThrownBy(()->
+                CQLTypeConverter.validatorToType("org.apache.cassandra.db.marshal.SetType(org.apache.cassandra.db.marshal.BytesType("))
+                .isInstanceOf(SchemaUpdateException.class)
+                .hasMessageContaining("Invalid validator");
     }
 
     @Test
@@ -72,6 +82,11 @@ public class CQLTypeConverterTest {
                 CQLTypeConverter.validatorToType("org.apache.cassandra.db.marshal.FrozenType"))
                 .isInstanceOf(SchemaUpdateException.class)
                 .hasMessageContaining("Frozen requires a type definition");
+
+        assertThatThrownBy(()->
+                CQLTypeConverter.validatorToType("org.apache.cassandra.db.marshal.ReversedType"))
+                .isInstanceOf(SchemaUpdateException.class)
+                .hasMessageContaining("Can not use reversed validator without type");
 
         assertThatThrownBy(()->
                 CQLTypeConverter.validatorToType("org.apache.cassandra.db.marshal.MapType"))
