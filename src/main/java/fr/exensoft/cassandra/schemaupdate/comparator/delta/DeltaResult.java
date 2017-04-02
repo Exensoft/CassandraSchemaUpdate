@@ -35,14 +35,26 @@ public class DeltaResult {
         return keyspaceDelta.hasFlag(flag) || tablesDelta.values().stream().anyMatch(d->d.hasFlag(flag));
     }
 
+    /**
+     * Name of the keyspace
+     * @return
+     */
     public String getKeyspace() {
         return keyspace;
     }
 
+    /**
+     * Returns the deltaList of the keyspace's structure
+     * @return
+     */
     public DeltaList getKeyspaceDelta() {
         return keyspaceDelta;
     }
 
+    /**
+     * Returns a map containing the deltaList of each tables of the keyspace
+     * @return
+     */
     public Map<String, DeltaList> getTablesDelta() {
         return tablesDelta;
     }

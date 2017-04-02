@@ -162,7 +162,7 @@ SchemaUpdate schemaUpdate = new SchemaUpdate.Builder()
 Pour créer un patch il faut que vous ayez au préalable définit le `Keyspace` cible que vous souhaitez obtenir. Il suffit ensuite d'appeler la méthode `createPatch` :
 
 ```java
-DeltaResult patch  = schemaUpdate.createPatch(targetKeyspace);
+DeltaResult patch = schemaUpdate.createPatch(targetKeyspace);
 ```
 L'objet `DeltaResult` retourné contient le patch à exécuter pour obtenir le keyspace cible dans votre base Cassandra.
 
@@ -178,7 +178,7 @@ if(patch.hasUpdate()) {
 On peut aussi savoir simplement si le patch contient des opérations qui risquent d'engendrer une perte de données :
 ```java
 if(patch.hasFlag(DeltaFlag.DATA_LOSS)) {
-	System.out.println("Attention, l'exécution de ce patch risque d'engendrer une pertede données");
+	System.out.println("Attention, l'exécution de ce patch risque d'engendrer une perte de données");
 }
 ```
 
@@ -229,6 +229,7 @@ schemaUpdate.close();
 
 ### Création d'un schéma
 ```java
+// Création du schéma cible
 Keyspace keyspace = new Keyspace("my_application")
 		.addTable(new Table("users")
 				.addColumn(new Column("login", BasicType.VARCHAR))
@@ -245,6 +246,7 @@ Keyspace keyspace = new Keyspace("my_application")
 				.addIndex("messages_user1_login_index", "user1_login")
 				.addIndex("messages_user2_login_index", "user2_login"));
 
+// Instanciation de notre SchemaUpdate
 SchemaUpdate schemaUpdate = new SchemaUpdate.Builder()
 		.withCluster(new Cluster.Builder()
 				.withPort(9042)
@@ -252,7 +254,12 @@ SchemaUpdate schemaUpdate = new SchemaUpdate.Builder()
 				.build())
 		.build();
 
+// Création du patch
 DeltaResult patch = schemaUpdate.createPatch(keyspace);
 
+// Application du patch
 schemaUpdate.applyPatch(patch);
+
+// Fermeture du SchemaUpdate
+schemaUpdate.close();
 ```
