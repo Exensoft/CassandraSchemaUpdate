@@ -5,6 +5,11 @@
 
 1. [Présentation](#presentation)
 2. [Fonctionnement](#fonctionnement)
+	1. [Décrire les éléments](#décrire-les-éléments)
+		1. [Décrire une colonne](#décrire-une-colonne)
+		2. [Décrire une table](#décrire-une-table)
+		3. Décrire un keyspace
+	2. Créer un patch et l'exécuter
 
 ## Présentation
 Cette librairie permet de réaliser simplement les actions suivantes sur une base de données Cassandra :
@@ -17,7 +22,57 @@ Cette librairie permet de réaliser simplement les actions suivantes sur une bas
 
 ## Fonctionnement
 
-### Décrire une table
+###Décrire les éléments
+Pour utiliser CassandraSchemaUpdate, il faut dans un premier temps savoir décrire le schéma que l'on veut créer. 
+Un schéma se compose principalement des éléments suivants : `Keyspace`, `Table`et `Column`. Nous allons voir comment décrire ces structures.
+
+#### Décrire une colonne
+Une colonne est décrite par son nom et son type. Pour en construire une, il faut créer une instance de la classe `Column`. Voici comment construire une colonne simple :
+```java
+Column column = new Column("name", BasicType.INT);
+```
+
+Les types basiques disponibles sont les suivants : 
+| Type Cassandra   |    Constante associée |
+|------------------|-----------------------|
+| `ascii`          | `BasicType.ASCII`     |
+| `bigint`         | `BasicType.BIGINT`    |
+| `blob`           | `BasicType.BLOB`      |
+| `boolean`        | `BasicType.BOOLEAN`   |
+| `counter`        | `BasicType.COUNTER`   |
+| `decimal`        | `BasicType.DECIMAL`   |
+| `double`         | `BasicType.DOUBLE`    |
+| `float`          | `BasicType.FLOAT`     |
+| `inet`           | `BasicType.INET`      |
+| `int`            | `BasicType.INT`       |
+| `text`           | `BasicType.TEXT`      |
+| `timestamp`      | `BasicType.TIMESTAMP` |
+| `timeuuid`       | `BasicType.TIMEUUID`  |
+| `uuid`           | `BasicType.UUID`      |
+| `varchar`        | `BasicType.VARCHAR`   |
+| `varint`         | `BasicType.VARINT`    |
+
+En plus de ces types basiques, il est possibles d'utiliser des structures plus complexes telles que de *map*, des *list* ou des *set*.
+
+Les *list* et les *set* sont des ensembles d'éléments d'un autre type, ils se déclarent de manière analogue.
+Il faut construire des instances de `ListType`ou de `SetType`avec le type fils en paramètre :
+
+```java
+// Création d'une colonne de type list<int>
+Column column1 = new Column("colum1", new ListType(BasicType.INT));
+
+// Création d'une colonne de type set<text>
+Column column2 = new Column("colum2", new SetType(BasicType.TEXT));
+```
+
+Les *map* sont des ensembles de clé d'un premier type et de valeurs d'un second type.
+Pour créer une map, il faut utiliser une instance de `MapType`, on lui donne en premier paramètre le type de la clé et en second paramètre le type des valeurs :
+```java
+//Création d'une colonne de type map<int, text>
+Column column = new Column("column", new MapType(BasicType.INT, BasicType.TEXT));
+```
+
+#### Décrire une table
 Pour décrire une table il faut créer une instance de la classe `Table` avec comme paramètre le nom de la table :
 ```java
 Table table = new Table("table_name");
