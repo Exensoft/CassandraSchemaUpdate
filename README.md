@@ -9,7 +9,7 @@
 		1. [Décrire une colonne](#décrire-une-colonne)
 		2. [Décrire une table](#décrire-une-table)
 		3. [Décrire un keyspace](#décrire-un-keyspace)
-	2. Créer un patch et l'exécuter
+	2. [Créer un patch et l'exécuter](#créer-un-patch-et-lexécuter)
 
 ## Présentation
 Cette librairie permet de réaliser simplement les actions suivantes sur une base de données Cassandra :
@@ -130,3 +130,14 @@ Vous pouvez ensuite ajouter des tables à votre keyspace :
 keyspace.addTable(table);
 ```
 ### Créer un patch et l'exécuter
+
+Classiquement, CassandraSchemaUpdate fonctionne en trois grande étapes :
+
+ * Description de votre schéma (une instance de `Keyspace`)
+ * Comparaison de votre schéma avec le schéma actuellement existant dans Cassandra, création d'un patch décrivant la différence entre les deux schémas (le delta)
+ * Application du patch créé à l'étape précédente
+
+Nous avons choisi de séparer la création du patch de son application car il peut arriver que certains patch entraînent une perte de données. Nous avons donc préféré mettre à disposition des méthodes permettant d'explorer le patch et de vérifier où se situent les pertes de données si il y en a.
+
+#### Création du patch
+Pour créer un patch, il faut dans un premier temps créer une instance de `SchemaUpdate`.
