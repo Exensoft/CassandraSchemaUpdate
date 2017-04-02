@@ -33,24 +33,26 @@ Column column = new Column("name", BasicType.INT);
 ```
 
 Les types basiques disponibles sont les suivants : 
+
 | Type Cassandra   |    Constante associée |
 | ---------------- | --------------------- |
-| ascii          | BasicType.ASCII     |
-| bigint         | BasicType.BIGINT    |
-| blob           | BasicType.BLOB      |
-| boolean        | BasicType.BOOLEAN   |
-| counter        | BasicType.COUNTER   |
-| decimal        | BasicType.DECIMAL   |
-| double         | BasicType.DOUBLE    |
-| float          | BasicType.FLOAT     |
-| inet           | BasicType.INET      |
-| int            | BasicType.INT       |
-| text           | BasicType.TEXT      |
-| timestamp      | BasicType.TIMESTAMP |
-| timeuuid       | BasicType.TIMEUUID  |
-| uuid           | BasicType.UUID      |
-| varchar        | BasicType.VARCHAR   |
-| varint         | BasicType.VARINT    |
+| `ascii`          | `BasicType.ASCII`     |
+| `bigint`         | `BasicType.BIGINT`    |
+| `blob`           | `BasicType.BLOB`      |
+| `boolean`        | `BasicType.BOOLEAN`   |
+| `counter`        | `BasicType.COUNTER`   |
+| `decimal`        | `BasicType.DECIMAL`   |
+| `double`         | `BasicType.DOUBLE`    |
+| `float`          | `BasicType.FLOAT`     |
+| `inet`           | `BasicType.INET`      |
+| `int`            | `BasicType.INT`       |
+| `text`           | `BasicType.TEXT`      |
+| `timestamp`      | `BasicType.TIMESTAMP` |
+| `timeuuid`       | `BasicType.TIMEUUID`  |
+| `uuid`           | `BasicType.UUID`      |
+| `varchar`        | `BasicType.VARCHAR`   |
+| `varint`         | `BasicType.VARINT`    |
+
 
 En plus de ces types basiques, il est possibles d'utiliser des structures plus complexes telles que de *map*, des *list* ou des *set*.
 
