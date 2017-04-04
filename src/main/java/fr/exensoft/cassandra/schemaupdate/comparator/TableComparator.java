@@ -326,7 +326,7 @@ public class TableComparator {
 
         //Find key modification
         if(!compareKeys(source.getPartitioningKeys(), target.getPartitioningKeys(), renamedColumns)) {
-            LOGGER.debug("Partitionning key changed");
+            LOGGER.debug("Partitionning key changed : {} --> {}", source.getPartitioningKeys(), target.getPartitioningKeys());
             deltaList.addFlag(DeltaFlag.NEED_RECREATE);
         }
 
