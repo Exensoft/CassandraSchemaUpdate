@@ -128,7 +128,6 @@ public class CassandraConnection {
 			boolean isReversed = CQLTypeConverter.isReversed(validator);
 
 			Column column = new Column(columnName, columnType);
-			column.setIndex(componentIndex);
 			table.addColumn(column);
 
 			if(PARTITION_KEY.equals(type)) {
@@ -148,6 +147,7 @@ public class CassandraConnection {
 				}
 				table.addIndex(indexName, columnName, option);
 			}
+			column.setIndex(componentIndex);
 		}
 
 		table.validate();

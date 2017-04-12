@@ -373,8 +373,8 @@ public class TableComparator {
             if(renamedColumns.containsKey(source)) {
                 source = renamedColumns.get(source);
             }
-
             if(!source.equals(target)) {
+                System.out.println("DIFF "+source+" <- "+target);
                 return false;
             }
         }

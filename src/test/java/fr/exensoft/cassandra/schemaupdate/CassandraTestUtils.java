@@ -66,8 +66,8 @@ public class CassandraTestUtils {
 
         ResultSet table2RS = createResultSet(Arrays.asList(
                 createTableColumnRow("column1", 1, "", "", "", "partition_key", "org.apache.cassandra.db.marshal.Int32Type"),
-                createTableColumnRow("column2", 1, "", "", "", "clustering_key", "org.apache.cassandra.db.marshal.UTF8Type"),
                 createTableColumnRow("column3", 2, "", "", "", "clustering_key", "org.apache.cassandra.db.marshal.ReversedType(org.apache.cassandra.db.marshal.Int32Type)"),
+                createTableColumnRow("column2", 1, "", "", "", "clustering_key", "org.apache.cassandra.db.marshal.UTF8Type"),
                 createTableColumnRow("column4", 0, "", "", "", "", "org.apache.cassandra.db.marshal.UTF8Type"),
                 createTableColumnRow("column5", 0, "test_index", "{}", "COMPOSITES", "", "org.apache.cassandra.db.marshal.UTF8Type")
         ));
