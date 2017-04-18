@@ -23,6 +23,12 @@ public class CassandraTestUtils {
         return rs;
     }
 
+    private static Row createVersionRow(String version) {
+        Row row = Mockito.mock(Row.class);
+        Mockito.doReturn(version).when(row).getString(Mockito.eq("release_version"));
+        return row;
+    }
+
     private static Row createKeyspaceRow(String keyspace_name) {
         Row row = Mockito.mock(Row.class);
         Mockito.doReturn(keyspace_name).when(row).getString(Mockito.eq("keyspace_name"));
@@ -111,8 +117,10 @@ public class CassandraTestUtils {
     private static Session createSession() {
         Session session = Mockito.mock(Session.class);
 
+        ResultSet versionRS = createResultSet(Arrays.asList(createVersionRow("2.2.9")));
         ResultSet keyspacesRS = createResultSet(Arrays.asList(createKeyspaceRow("keyspace1"), createKeyspaceRow("keyspace2")));
 
+        Mockito.doReturn(versionRS).when(session).execute(Mockito.eq("select release_version from system.local"));
         Mockito.doReturn(keyspacesRS).when(session).execute(Mockito.eq("SELECT * FROM system.schema_keyspaces"));
         Mockito.doReturn(createSchemaKeyspacesStatement(session)).when(session).prepare(Mockito.eq("SELECT * FROM system.schema_keyspaces WHERE keyspace_name=?"));
         Mockito.doReturn(createSchemaKeyspaceTablesStatement(session)).when(session).prepare(Mockito.eq("SELECT * FROM system.schema_columnfamilies WHERE keyspace_name=?"));

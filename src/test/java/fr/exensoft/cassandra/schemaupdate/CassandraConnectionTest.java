@@ -58,7 +58,6 @@ public class CassandraConnectionTest {
         cassandraConnection.connect();
 
         Mockito.verify(cluster, Mockito.times(1)).connect();
-        Mockito.verify(session, Mockito.times(3)).prepare(Mockito.anyString());
 
         cassandraConnection.close();
         cassandraConnection.close();
