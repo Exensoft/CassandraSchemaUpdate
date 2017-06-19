@@ -1,6 +1,8 @@
 package fr.exensoft.cassandra.schemaupdate;
 
 
+import fr.exensoft.cassandra.schemaupdate.cluster.CassandraTestUtils;
+import fr.exensoft.cassandra.schemaupdate.cluster.CassandraV2Mock;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.AbstractDelta;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.DeltaResult;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.keyspace.CreateKeyspaceDelta;
@@ -34,7 +36,7 @@ public class SchemaUpdateTest {
     @Test
     public void createPatchTest_BuilderWithCluster() {
         SchemaUpdate schemaUpdate = new SchemaUpdate.Builder()
-                .withCluster(CassandraTestUtils.createCluster())
+                .withCluster(new CassandraV2Mock().createCluster())
                 .build();
 
         // Keyspace description like the "CassandraTestUtils" sample keyspace

@@ -2,19 +2,15 @@ package fr.exensoft.cassandra.schemaupdate;
 
 import com.datastax.driver.core.*;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.AbstractDelta;
-import fr.exensoft.cassandra.schemaupdate.loader.Cassandra2SchemaLoader;
-import fr.exensoft.cassandra.schemaupdate.model.Column;
+import fr.exensoft.cassandra.schemaupdate.loader.CassandraV2SchemaLoader;
+import fr.exensoft.cassandra.schemaupdate.loader.CassandraV3SchemaLoader;
+import fr.exensoft.cassandra.schemaupdate.loader.ClusterSchemaLoader;
 import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
 import fr.exensoft.cassandra.schemaupdate.model.Table;
-import fr.exensoft.cassandra.schemaupdate.model.type.ColumnType;
-import fr.exensoft.cassandra.schemaupdate.model.values.IndexOption;
-import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
-import fr.exensoft.cassandra.schemaupdate.utils.CQLTypeConverter;
 import fr.exensoft.cassandra.schemaupdate.loader.SchemaLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class CassandraConnection implements SchemaLoader {
@@ -48,6 +44,7 @@ public class CassandraConnection implements SchemaLoader {
 		}
 		isConnected = false;
 
+
 		session.close();
 		cluster.close();
 	}
@@ -59,7 +56,12 @@ public class CassandraConnection implements SchemaLoader {
 
     @Override
     public List<String> listKeyspaces() {
-        return getSchemaLoader().listKeyspaces();
+	    List<KeyspaceMetadata> tests = cluster.getMetadata().getKeyspaces();
+
+
+
+        //return getSchemaLoader().listKeyspaces();
+        return null;
     }
 
     @Override
@@ -81,14 +83,21 @@ public class CassandraConnection implements SchemaLoader {
 	    if(schemaLoader != null) {
 	        return schemaLoader;
         }
+        /*
         int majorVersion = getMajorVersion();
-	    if(majorVersion == 2) {
-            schemaLoader = new Cassandra2SchemaLoader(session);
+        if(majorVersion == 2) {
+            schemaLoader = new CassandraV2SchemaLoader(session);
+            return schemaLoader;
+        }
+        else if(majorVersion == 3) {
+            schemaLoader = new CassandraV3SchemaLoader(session);
             return schemaLoader;
         }
         else {
 	        throw new SchemaUpdateException(String.format("Unhandled major version %d", majorVersion));
-        }
+        }*/
+        schemaLoader = new ClusterSchemaLoader(cluster);
+        return schemaLoader;
     }
 
     private int getMajorVersion() {

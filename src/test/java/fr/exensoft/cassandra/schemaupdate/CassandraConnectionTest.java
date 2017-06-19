@@ -2,6 +2,8 @@ package fr.exensoft.cassandra.schemaupdate;
 
 
 import com.datastax.driver.core.*;
+import fr.exensoft.cassandra.schemaupdate.cluster.CassandraTestUtils;
+import fr.exensoft.cassandra.schemaupdate.cluster.CassandraV2Mock;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.table.CreateTableDelta;
 import fr.exensoft.cassandra.schemaupdate.model.Column;
 import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
@@ -47,6 +49,19 @@ public class CassandraConnectionTest {
     }
 
     @Test
+    public void test2() {
+        Cluster cluster = new Cluster.Builder()
+                .addContactPoint("localhost")
+                .build();
+
+        CassandraConnection connection = new CassandraConnection(cluster);
+        connection.connect();
+
+        Keyspace c = connection.loadKeyspace("graphene");
+        System.out.println(c);
+    }
+
+    @Test
     public void connectCloseTest() {
         Cluster cluster = Mockito.mock(Cluster.class);
         Session session = Mockito.mock(Session.class);
@@ -68,7 +83,7 @@ public class CassandraConnectionTest {
 
     @Test
     public void listKeyspacesTest() {
-        CassandraConnection connection = new CassandraConnection(CassandraTestUtils.createCluster());
+        CassandraConnection connection = new CassandraConnection(new CassandraV2Mock().createCluster());
 
         connection.connect();
 
@@ -79,7 +94,7 @@ public class CassandraConnectionTest {
 
     @Test
     public void loadKeyspaceTest() {
-        CassandraConnection connection = new CassandraConnection(CassandraTestUtils.createCluster());
+        CassandraConnection connection = new CassandraConnection(new CassandraV2Mock().createCluster());
 
         connection.connect();
 

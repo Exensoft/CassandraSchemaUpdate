@@ -12,7 +12,7 @@ import fr.exensoft.cassandra.schemaupdate.utils.CQLTypeConverter;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Cassandra2SchemaLoader implements SchemaLoader{
+public class CassandraV3SchemaLoader implements SchemaLoader{
 
     private final static String PARTITION_KEY = "partition_key";
     private final static String CLUSTERING_KEY = "clustering_key";
@@ -26,10 +26,10 @@ public class Cassandra2SchemaLoader implements SchemaLoader{
     private PreparedStatement selectKeyspaceTables;
     private PreparedStatement selectTableColumns;
 
-    public Cassandra2SchemaLoader(Session session) {
+    public CassandraV3SchemaLoader(Session session) {
         this.session = session;
 
-        selectKeyspace = session.prepare("SELECT * FROM system.schema_keyspaces WHERE keyspace_name=?");
+        selectKeyspace = session.prepare("SELECT * FROM system_schema.keyspaces WHERE keyspace_name=?");
         selectKeyspaceTables = session.prepare("SELECT * FROM system.schema_columnfamilies WHERE keyspace_name=?");
         selectTableColumns = session.prepare("SELECT * FROM system.schema_columns WHERE keyspace_name=? AND columnfamily_name=?");
     }

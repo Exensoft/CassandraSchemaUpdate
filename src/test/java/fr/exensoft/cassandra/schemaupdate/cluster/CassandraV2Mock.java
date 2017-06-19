@@ -1,47 +1,25 @@
-package fr.exensoft.cassandra.schemaupdate;
-
+package fr.exensoft.cassandra.schemaupdate.cluster;
 
 import com.datastax.driver.core.*;
 import org.mockito.Mockito;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class CassandraTestUtils {
-
-    private static ResultSet createResultSet(List<Row> rows) {
-        ResultSet rs = Mockito.mock(ResultSet.class);
-        if(rows.size() > 0) {
-            Mockito.doReturn(rows.get(0)).when(rs).one();
-        }
-        else {
-            Mockito.doReturn(null).when(rs).one();
-        }
-
-        Mockito.doReturn(rows.iterator()).when(rs).iterator();
-        return rs;
-    }
-
-    private static Row createVersionRow(String version) {
-        Row row = Mockito.mock(Row.class);
-        Mockito.doReturn(version).when(row).getString(Mockito.eq("release_version"));
-        return row;
-    }
-
-    private static Row createKeyspaceRow(String keyspace_name) {
+public class CassandraV2Mock extends CassandraTestUtils{
+    private Row createKeyspaceRow(String keyspace_name) {
         Row row = Mockito.mock(Row.class);
         Mockito.doReturn(keyspace_name).when(row).getString(Mockito.eq("keyspace_name"));
         return row;
     }
 
-    private static Row createKeyspaceTableRow(String columnfamily_name) {
+    private Row createKeyspaceTableRow(String columnfamily_name) {
         Row row = Mockito.mock(Row.class);
         Mockito.doReturn(columnfamily_name).when(row).getString(Mockito.eq("columnfamily_name"));
         return row;
     }
 
-    private static Row createTableColumnRow(String column_name, int component_index, String index_name, String index_options, String index_type, String type, String validator) {
+    private Row createTableColumnRow(String column_name, int component_index, String index_name, String index_options, String index_type, String type, String validator) {
         Row row = Mockito.mock(Row.class);
         Mockito.doReturn(column_name).when(row).getString(Mockito.eq("column_name"));
         Mockito.doReturn(component_index).when(row).getInt(Mockito.eq("component_index"));
@@ -53,7 +31,7 @@ public class CassandraTestUtils {
         return row;
     }
 
-    private static PreparedStatement createTableColumnsStatement(Session session) {
+    private PreparedStatement createTableColumnsStatement(Session session) {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
         BoundStatement boundStatement = Mockito.mock(BoundStatement.class);
         AtomicReference<String> targetTable = new AtomicReference<>("table1");
@@ -91,7 +69,7 @@ public class CassandraTestUtils {
         return preparedStatement;
     }
 
-    private static PreparedStatement createSchemaKeyspaceTablesStatement(Session session) {
+    private PreparedStatement createSchemaKeyspaceTablesStatement(Session session) {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
         BoundStatement boundStatement = Mockito.mock(BoundStatement.class);
@@ -103,7 +81,7 @@ public class CassandraTestUtils {
         return preparedStatement;
     }
 
-    private static PreparedStatement createSchemaKeyspacesStatement(Session session) {
+    private PreparedStatement createSchemaKeyspacesStatement(Session session) {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
         BoundStatement boundStatement = Mockito.mock(BoundStatement.class);
 
@@ -114,7 +92,7 @@ public class CassandraTestUtils {
         return preparedStatement;
     }
 
-    private static Session createSession() {
+    private Session createSession() {
         Session session = Mockito.mock(Session.class);
 
         ResultSet versionRS = createResultSet(Arrays.asList(createVersionRow("2.2.9")));
@@ -129,7 +107,7 @@ public class CassandraTestUtils {
         return session;
     }
 
-    public static Cluster createCluster() {
+    public Cluster createCluster() {
         Cluster cluster = Mockito.mock(Cluster.class);
         Session session = createSession();
         Mockito.doReturn(session).when(cluster).connect();
