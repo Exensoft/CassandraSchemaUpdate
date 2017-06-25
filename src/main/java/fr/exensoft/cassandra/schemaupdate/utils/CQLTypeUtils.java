@@ -4,7 +4,6 @@ package fr.exensoft.cassandra.schemaupdate.utils;
 import fr.exensoft.cassandra.schemaupdate.model.type.*;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class CQLTypeUtils {
 
@@ -50,11 +49,8 @@ public class CQLTypeUtils {
             }
 
             //timeuuid -> uuid
-            if(type2.equals(BasicType.UUID) && type1.equals(BasicType.TIMEUUID)) {
-                return true;
-            }
+            return type2.equals(BasicType.UUID) && type1.equals(BasicType.TIMEUUID);
 
-            return false;
         }
         else if(type1.getClass() != type2.getClass()){
             return false;
@@ -89,11 +85,8 @@ public class CQLTypeUtils {
                 return true;
             }
             //int -> varint
-            if(type2.equals(BasicType.VARINT) && type1.equals(BasicType.INT)) {
-                return true;
-            }
+            return type2.equals(BasicType.VARINT) && type1.equals(BasicType.INT);
 
-            return false;
         }
         else if(type1.getClass() != type2.getClass()){
             return false;

@@ -92,7 +92,7 @@ public class CassandraV2SchemaLoader implements SchemaLoader{
             String columnName = row.getString("column_name");
             int componentIndex = row.getInt("component_index");
             String indexName = row.getString("index_name");
-            String indexOptions = row.getString("index_options");;
+            String indexOptions = row.getString("index_options");
             String indexType = row.getString("index_type");
             String type = row.getString("type");
             String validator = row.getString("validator");

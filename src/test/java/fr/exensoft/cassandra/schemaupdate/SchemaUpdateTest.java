@@ -1,8 +1,7 @@
 package fr.exensoft.cassandra.schemaupdate;
 
 
-import fr.exensoft.cassandra.schemaupdate.cluster.CassandraTestUtils;
-import fr.exensoft.cassandra.schemaupdate.cluster.CassandraV2Mock;
+import fr.exensoft.cassandra.schemaupdate.cluster.CassandraClusterMock;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.AbstractDelta;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.DeltaResult;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.keyspace.CreateKeyspaceDelta;
@@ -27,7 +26,7 @@ public class SchemaUpdateTest {
     public void builderTest_BuilderError() {
         SchemaUpdate.Builder schemaUpdateBuilder = new SchemaUpdate.Builder();
 
-        assertThatThrownBy(()->schemaUpdateBuilder.build())
+        assertThatThrownBy(schemaUpdateBuilder::build)
                 .isInstanceOf(SchemaUpdateException.class);
     }
 
@@ -35,8 +34,9 @@ public class SchemaUpdateTest {
 
     @Test
     public void createPatchTest_BuilderWithCluster() {
+
         SchemaUpdate schemaUpdate = new SchemaUpdate.Builder()
-                .withCluster(new CassandraV2Mock().createCluster())
+                .withCluster(new CassandraClusterMock().createCluster())
                 .build();
 
         // Keyspace description like the "CassandraTestUtils" sample keyspace
@@ -66,6 +66,7 @@ public class SchemaUpdateTest {
         assertThat(patch.getTablesDelta()).hasSize(2);
         assertThat(patch.getTablesDelta().get("table1").hasUpdate()).isFalse();
         assertThat(patch.getTablesDelta().get("table2").hasUpdate()).isFalse();
+
     }
 
 

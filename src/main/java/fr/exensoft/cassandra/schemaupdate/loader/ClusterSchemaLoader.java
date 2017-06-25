@@ -2,7 +2,6 @@ package fr.exensoft.cassandra.schemaupdate.loader;
 
 import com.datastax.driver.core.*;
 import fr.exensoft.cassandra.schemaupdate.model.Column;
-import fr.exensoft.cassandra.schemaupdate.model.Index;
 import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
 import fr.exensoft.cassandra.schemaupdate.model.Table;
 import fr.exensoft.cassandra.schemaupdate.model.type.*;

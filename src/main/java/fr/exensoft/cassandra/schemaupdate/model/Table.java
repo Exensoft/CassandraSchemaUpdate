@@ -6,7 +6,6 @@ import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
 import sun.reflect.generics.tree.BaseType;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Table object represents a Cassandra table with its columns and its indexes.
@@ -252,7 +251,7 @@ public class Table {
     }
 
     private void sortColumns(List<Column> columnsToSort) {
-        Collections.sort(columnsToSort, (a,b)->{
+        columnsToSort.sort((a,b)->{
             int priorityA = partitioningKeys.contains(a)?3:(clusteringColumns.contains(a)?2:1);
             int priorityB = partitioningKeys.contains(b)?3:(clusteringColumns.contains(b)?2:1);
             int comparation = -Integer.compare(priorityA, priorityB);

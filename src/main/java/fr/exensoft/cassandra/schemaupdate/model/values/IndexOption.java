@@ -6,7 +6,7 @@ public enum IndexOption {
 
     private String value;
 
-    private IndexOption(String value) {
+    IndexOption(String value) {
         this.value = value;
     }
 

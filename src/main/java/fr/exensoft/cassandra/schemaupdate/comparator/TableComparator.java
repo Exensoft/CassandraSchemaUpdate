@@ -26,7 +26,7 @@ public class TableComparator {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TableComparator.class);
 
-    private static enum CType { PARTITIONING_KEY, CLUSTERING_KEY, COLUMN }
+    private enum CType { PARTITIONING_KEY, CLUSTERING_KEY, COLUMN }
 
     //Source table
     private Table source;
@@ -231,7 +231,7 @@ public class TableComparator {
     private void compareColumns(DeltaList deltaList) {
         List<String> deletedColumns = new ArrayList<>();
         List<String> createdColumns = new ArrayList<>();
-        Map<String, String> renamedColumns = new HashMap<String, String>();
+        Map<String, String> renamedColumns = new HashMap<>();
 
         //Find deleted columns (present in source table but not in target table)
         for(Column sourceColumn : source.getColumns()) {

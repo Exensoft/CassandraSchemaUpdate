@@ -24,7 +24,7 @@ public enum BasicType implements ColumnType{
 
     private String validator;
 
-    private BasicType(String type, String validator) {
+    BasicType(String type, String validator) {
         this.type = type;
         this.validator = validator;
     }

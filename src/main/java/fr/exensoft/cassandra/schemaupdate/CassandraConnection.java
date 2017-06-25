@@ -56,12 +56,7 @@ public class CassandraConnection implements SchemaLoader {
 
     @Override
     public List<String> listKeyspaces() {
-	    List<KeyspaceMetadata> tests = cluster.getMetadata().getKeyspaces();
-
-
-
-        //return getSchemaLoader().listKeyspaces();
-        return null;
+	    return getSchemaLoader().listKeyspaces();
     }
 
     @Override

@@ -1,13 +1,10 @@
 package fr.exensoft.cassandra.schemaupdate.utils;
 
-import com.google.common.collect.ImmutableMap;
-import fr.exensoft.cassandra.schemaupdate.SchemaUpdate;
 import fr.exensoft.cassandra.schemaupdate.SchemaUpdateException;
 import fr.exensoft.cassandra.schemaupdate.model.type.*;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CQLTypeConverter {

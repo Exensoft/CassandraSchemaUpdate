@@ -1,7 +1,5 @@
 package fr.exensoft.cassandra.schemaupdate.model.type;
 
-import java.util.Set;
-
 public class SetType implements ColumnType, OneParameterType{
 
     public final static String VALIDATOR = "org.apache.cassandra.db.marshal.SetType";
