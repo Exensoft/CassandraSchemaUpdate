@@ -2,8 +2,6 @@ package fr.exensoft.cassandra.schemaupdate;
 
 import com.datastax.driver.core.*;
 import fr.exensoft.cassandra.schemaupdate.comparator.delta.AbstractDelta;
-import fr.exensoft.cassandra.schemaupdate.loader.CassandraV2SchemaLoader;
-import fr.exensoft.cassandra.schemaupdate.loader.CassandraV3SchemaLoader;
 import fr.exensoft.cassandra.schemaupdate.loader.ClusterSchemaLoader;
 import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
 import fr.exensoft.cassandra.schemaupdate.model.Table;
@@ -78,36 +76,8 @@ public class CassandraConnection implements SchemaLoader {
 	    if(schemaLoader != null) {
 	        return schemaLoader;
         }
-        /*
-        int majorVersion = getMajorVersion();
-        if(majorVersion == 2) {
-            schemaLoader = new CassandraV2SchemaLoader(session);
-            return schemaLoader;
-        }
-        else if(majorVersion == 3) {
-            schemaLoader = new CassandraV3SchemaLoader(session);
-            return schemaLoader;
-        }
-        else {
-	        throw new SchemaUpdateException(String.format("Unhandled major version %d", majorVersion));
-        }*/
+
         schemaLoader = new ClusterSchemaLoader(cluster);
         return schemaLoader;
-    }
-
-    private int getMajorVersion() {
-        ResultSet rs = session.execute("select release_version from system.local");
-        Row row = rs.one();
-        if(row == null) {
-            return 0;
-        }
-        String version = row.getString("release_version");
-        if(version.charAt(0) == '2') {
-            return 2;
-        }
-        else if(version.charAt(0) == '3') {
-            return 3;
-        }
-        return 0;
     }
 }

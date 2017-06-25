@@ -52,6 +52,13 @@ public class CassandraClusterMock extends CassandraTestUtils{
 
         Mockito.doReturn(tables).when(keyspaceMetadata).getTables();
 
+        if(tables != null) {
+            tables.forEach((tableMetadata -> {
+                String name = tableMetadata.getName();
+                Mockito.doReturn(tableMetadata).when(keyspaceMetadata).getTable(name);
+            }));
+        }
+
         return keyspaceMetadata;
     }
 

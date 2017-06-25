@@ -20,7 +20,6 @@ public interface SchemaLoader {
      */
     Keyspace loadKeyspace(String name);
 
-
     List<Table> loadTables(String keyspace_name);
 
     Table loadTable(String keyspace_name, String table_name);

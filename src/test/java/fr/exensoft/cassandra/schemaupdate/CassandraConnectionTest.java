@@ -10,6 +10,7 @@ import fr.exensoft.cassandra.schemaupdate.model.Table;
 import fr.exensoft.cassandra.schemaupdate.model.type.BasicType;
 import fr.exensoft.cassandra.schemaupdate.model.type.SetType;
 import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -77,6 +78,56 @@ public class CassandraConnectionTest {
         List<String> keyspaces = connection.listKeyspaces();
 
         assertThat(keyspaces).containsOnly("keyspace1","keyspace2");
+    }
+
+
+    @Test
+    public void loadTablesTest() {
+
+        CassandraConnection connection = new CassandraConnection(new CassandraClusterMock().createCluster());
+
+        connection.connect();
+
+        List<Table> tables = connection.loadTables("keyspace1");
+
+        assertThat(tables).hasSize(2);
+        assertThat(tables.get(0).getName()).isEqualTo("table1");
+        assertThat(tables.get(1).getName()).isEqualTo("table2");
+    }
+
+    @Test
+    public void loadTableTest() {
+
+        CassandraConnection connection = new CassandraConnection(new CassandraClusterMock().createCluster());
+
+        connection.connect();
+
+        Table table = connection.loadTable("keyspace1", "table1");
+
+        assertThat(table).isNotNull();
+        assertThat(table.getName()).isEqualTo("table1");
+        assertThat(table.getColumns()).hasSize(2);
+        assertThat(table.getColumn("column1")).isNotNull();
+        assertThat(table.getColumn("column1").getType()).isEqualTo(BasicType.UUID);
+        assertThat(table.getColumn("column2")).isNotNull();
+        assertThat(table.getColumn("column2").getType()).isEqualTo(new SetType(BasicType.TEXT));
+
+
+        table = connection.loadTable("keyspace1", "table2");
+
+        assertThat(table).isNotNull();
+        assertThat(table.getName()).isEqualTo("table2");
+        assertThat(table.getColumns()).hasSize(5);
+        assertThat(table.getColumn("column1")).isNotNull();
+        assertThat(table.getColumn("column1").getType()).isEqualTo(BasicType.INT);
+        assertThat(table.getColumn("column2")).isNotNull();
+        assertThat(table.getColumn("column2").getType()).isEqualTo(BasicType.TEXT);
+        assertThat(table.getColumn("column3")).isNotNull();
+        assertThat(table.getColumn("column3").getType()).isEqualTo(BasicType.INT);
+        assertThat(table.getColumn("column4")).isNotNull();
+        assertThat(table.getColumn("column4").getType()).isEqualTo(BasicType.TEXT);
+        assertThat(table.getColumn("column5")).isNotNull();
+        assertThat(table.getColumn("column5").getType()).isEqualTo(BasicType.TEXT);
     }
 
     @Test

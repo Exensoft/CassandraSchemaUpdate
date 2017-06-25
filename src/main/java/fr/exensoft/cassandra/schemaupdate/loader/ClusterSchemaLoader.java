@@ -50,7 +50,17 @@ public class ClusterSchemaLoader implements SchemaLoader {
 
     @Override
     public Table loadTable(String keyspace_name, String table_name) {
-        return null;
+        KeyspaceMetadata keyspaceMetadata = cluster.getMetadata().getKeyspace(keyspace_name);
+        if(keyspaceMetadata == null) {
+            return null;
+        }
+
+        TableMetadata tableMetadata = keyspaceMetadata.getTable(table_name);
+        if(tableMetadata == null) {
+            return null;
+        }
+
+        return loadTable(tableMetadata);
     }
 
     private List<Table> loadTables(KeyspaceMetadata keyspaceMetadata) {
