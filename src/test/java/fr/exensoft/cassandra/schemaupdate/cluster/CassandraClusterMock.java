@@ -87,13 +87,17 @@ public class CassandraClusterMock extends CassandraTestUtils{
         ColumnMetadata column3 = createColumnMetadata("column3", DataType.cint());
         ColumnMetadata column4 = createColumnMetadata("column4", DataType.text());
         ColumnMetadata column5 = createColumnMetadata("column5", DataType.text());
+        ColumnMetadata column6 = createColumnMetadata("column6", DataType.list(DataType.text()));
+        ColumnMetadata column7 = createColumnMetadata("column7", DataType.map(DataType.text(), DataType.frozenSet(DataType.cint())));
 
         return createTableMetadata("table2", Arrays.asList(
                 column1,
                 column2,
                 column3,
                 column4,
-                column5
+                column5,
+                column6,
+                column7
             ), Arrays.asList(
                 column1
             ), Arrays.asList(

@@ -7,8 +7,7 @@ import fr.exensoft.cassandra.schemaupdate.comparator.delta.table.CreateTableDelt
 import fr.exensoft.cassandra.schemaupdate.model.Column;
 import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
 import fr.exensoft.cassandra.schemaupdate.model.Table;
-import fr.exensoft.cassandra.schemaupdate.model.type.BasicType;
-import fr.exensoft.cassandra.schemaupdate.model.type.SetType;
+import fr.exensoft.cassandra.schemaupdate.model.type.*;
 import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Test;
@@ -88,7 +87,11 @@ public class CassandraConnectionTest {
 
         connection.connect();
 
-        List<Table> tables = connection.loadTables("keyspace1");
+        List<Table> tables = connection.loadTables("non_existing_keyspace");
+        assertThat(tables).isNull();
+
+
+        tables = connection.loadTables("keyspace1");
 
         assertThat(tables).hasSize(2);
         assertThat(tables.get(0).getName()).isEqualTo("table1");
@@ -102,7 +105,14 @@ public class CassandraConnectionTest {
 
         connection.connect();
 
-        Table table = connection.loadTable("keyspace1", "table1");
+        Table table = connection.loadTable("keyspace1", "non_existing_table");
+        assertThat(table).isNull();
+
+        table = connection.loadTable("non_existing_keyspace", "table1");
+        assertThat(table).isNull();
+
+
+        table = connection.loadTable("keyspace1", "table1");
 
         assertThat(table).isNotNull();
         assertThat(table.getName()).isEqualTo("table1");
@@ -117,7 +127,7 @@ public class CassandraConnectionTest {
 
         assertThat(table).isNotNull();
         assertThat(table.getName()).isEqualTo("table2");
-        assertThat(table.getColumns()).hasSize(5);
+        assertThat(table.getColumns()).hasSize(7);
         assertThat(table.getColumn("column1")).isNotNull();
         assertThat(table.getColumn("column1").getType()).isEqualTo(BasicType.INT);
         assertThat(table.getColumn("column2")).isNotNull();
@@ -128,6 +138,10 @@ public class CassandraConnectionTest {
         assertThat(table.getColumn("column4").getType()).isEqualTo(BasicType.TEXT);
         assertThat(table.getColumn("column5")).isNotNull();
         assertThat(table.getColumn("column5").getType()).isEqualTo(BasicType.TEXT);
+        assertThat(table.getColumn("column6")).isNotNull();
+        assertThat(table.getColumn("column6").getType()).isEqualTo(new ListType(BasicType.TEXT));
+        assertThat(table.getColumn("column7")).isNotNull();
+        assertThat(table.getColumn("column7").getType()).isEqualTo(new MapType(BasicType.TEXT, new FrozenType(new SetType(BasicType.INT))));
     }
 
     @Test
@@ -152,7 +166,7 @@ public class CassandraConnectionTest {
         assertThat(table1.getIndexes()).isEmpty();
 
         Table table2 = keyspace.getTable("table2");
-        assertThat(table2.getColumns()).hasSize(5);
+        assertThat(table2.getColumns()).hasSize(7);
         assertThat(table2.getColumn("column1")).isNotNull();
         assertThat(table2.getColumn("column1").getType()).isEqualTo(BasicType.INT);
         assertThat(table2.getColumn("column2")).isNotNull();
@@ -163,12 +177,22 @@ public class CassandraConnectionTest {
         assertThat(table2.getColumn("column4").getType()).isEqualTo(BasicType.TEXT);
         assertThat(table2.getColumn("column5")).isNotNull();
         assertThat(table2.getColumn("column5").getType()).isEqualTo(BasicType.TEXT);
+        assertThat(table2.getColumn("column6")).isNotNull();
+        assertThat(table2.getColumn("column6").getType()).isEqualTo(new ListType(BasicType.TEXT));
+        assertThat(table2.getColumn("column7")).isNotNull();
+        assertThat(table2.getColumn("column7").getType()).isEqualTo(new MapType(BasicType.TEXT, new FrozenType(new SetType(BasicType.INT))));
         assertThat(table2.getPartitioningKeys()).containsOnly(table2.getColumn("column1"));
         assertThat(table2.getClusteringColumns()).containsOnly(table2.getColumn("column2"), table2.getColumn("column3"));
         assertThat(table2.getSortOrders().get(table2.getColumn("column2"))).isEqualTo(SortOrder.ASC);
         assertThat(table2.getSortOrders().get(table2.getColumn("column3"))).isEqualTo(SortOrder.DESC);
         assertThat(table2.getIndexes()).hasSize(1);
         assertThat(table2.getIndex(table2.getColumn("column5")).getName()).isEqualTo("test_index");
+
+
+
+        // Test with non existing keyspace
+        keyspace = connection.loadKeyspace("non_existing_keyspace");
+        assertThat(keyspace).isNull();
     }
 
 }

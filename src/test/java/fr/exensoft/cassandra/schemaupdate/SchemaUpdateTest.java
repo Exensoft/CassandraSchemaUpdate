@@ -9,8 +9,7 @@ import fr.exensoft.cassandra.schemaupdate.comparator.delta.table.CreateTableDelt
 import fr.exensoft.cassandra.schemaupdate.model.Column;
 import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
 import fr.exensoft.cassandra.schemaupdate.model.Table;
-import fr.exensoft.cassandra.schemaupdate.model.type.BasicType;
-import fr.exensoft.cassandra.schemaupdate.model.type.SetType;
+import fr.exensoft.cassandra.schemaupdate.model.type.*;
 import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -54,6 +53,8 @@ public class SchemaUpdateTest {
                                 .addColumn(new Column("column3", BasicType.INT))
                                 .addColumn(new Column("column4", BasicType.TEXT))
                                 .addColumn(new Column("column5", BasicType.TEXT))
+                                .addColumn(new Column("column6", new ListType(BasicType.TEXT)))
+                                .addColumn(new Column("column7", new MapType(BasicType.TEXT, new FrozenType(new SetType(BasicType.INT)))))
                                 .addPartitioningKey("column1")
                                 .addClusteringColumn("column2")
                                 .addClusteringColumn("column3", SortOrder.DESC)

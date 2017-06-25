@@ -5,6 +5,7 @@ import fr.exensoft.cassandra.schemaupdate.comparator.delta.enums.DeltaType;
 import fr.exensoft.cassandra.schemaupdate.model.Column;
 import fr.exensoft.cassandra.schemaupdate.model.Keyspace;
 import fr.exensoft.cassandra.schemaupdate.model.Table;
+import fr.exensoft.cassandra.schemaupdate.model.values.SortOrder;
 
 import java.util.stream.Collectors;
 
@@ -53,7 +54,20 @@ public class CreateTableDelta extends TableAbstractDelta {
         }
         tableQuery.append(")");
         //End of table query
-        tableQuery.append(");");
+        tableQuery.append(")");
+
+        // Clustering Keys Orders ? (when not ASC)
+        if(target.getSortOrders().values().stream().anyMatch(SortOrder.DESC::equals)) {
+            tableQuery.append(" WITH CLUSTERING ORDER BY (")
+                    .append(target.getClusteringColumns().stream()
+                            .filter(column->target.getSortOrders().get(column).equals(SortOrder.DESC))
+                            .map(column->String.format("\"%s\" DESC", column.getName()))
+                            .collect(Collectors.joining(", "))
+                    )
+                    .append(")");
+        }
+
+        tableQuery.append(";");
         return tableQuery.toString();
     }
     private String generateColumnCQL(Column column) {
